@@ -1,4 +1,4 @@
-"""Build the three CLI plugin archives from the checked-out source."""
+"""Build the CLI plugin archives from the checked-out source."""
 import sys
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
@@ -11,7 +11,7 @@ destination.mkdir(parents=True, exist_ok=True)
 guides = {
     "gemini": """# TestRail для Gemini CLI
 
-Windows, macOS и Linux. Запустите установщик своей ОС из этого архива.
+Windows, macOS и Linux. Запустите установщик своей ОС.
 Для установки CLI нужен Node.js 22.12+; при скачивании также нужны npm и curl.
 Авторизуйтесь в Gemini CLI и подключите MCP:
 
@@ -48,16 +48,24 @@ def add_file(archive, name, data):
 
 common = ["server.mjs", "bridge-client.mjs", "install-cli.mjs", "JSON-MOCKS.md"]
 common += [file.relative_to(plugin).as_posix() for file in sorted((plugin / "runtime").glob("*.mjs"))]
-for agent in ("codex", "gemini", "copilot"):
-    archive_path = destination / f"testrail-chat-plugin-{agent}.zip"
+for agent in ("codex", "gemini", "copilot", "setup"):
+    archive_name = "testrail-chat-setup.zip" if agent == "setup" else f"testrail-chat-plugin-{agent}.zip"
+    archive_path = destination / archive_name
     with ZipFile(archive_path, "w") as archive:
         for name in common:
             add_file(archive, name, (plugin / name).read_bytes())
-        if agent == "codex":
+        if agent in ("codex", "setup"):
             for file in sorted(plugin.iterdir()):
                 if file.is_file() and file.name not in common:
+                    if agent == "setup" and file.name in {"Install Windows.cmd", "Install Linux.sh", "Install macOS.command"}:
+                        continue
                     add_file(archive, file.name, file.read_bytes())
-        else:
+        if agent == "setup":
+            menu = source / "installers" / "menu"
+            for name in ("setup.mjs", "Install Windows.cmd", "Install Linux.sh"):
+                add_file(archive, name, (menu / name).read_bytes())
+            add_file(archive, "Install macOS.command", (menu / "Install Linux.sh").read_bytes())
+        elif agent != "codex":
             launchers = source / "installers"
             add_file(archive, "Install Windows.cmd", (launchers / "Install Windows.cmd").read_bytes())
             unix = (launchers / "Install Linux.sh").read_bytes()

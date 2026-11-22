@@ -2,6 +2,12 @@
 
 Локальный сервер связывает расширение Chrome TestRail AI Generator с Codex, Gemini CLI и GitHub Copilot. Чат может читать кейсы и промпты и редактировать черновики. Панель Chrome может запускать генерацию кейсов, спецификаций и автотестов через CLI выбранного агента.
 
+## Установка через консольное меню
+
+Скачайте [`testrail-chat-setup.zip`](https://github.com/mikhailhimei/TestRail-AI-Generator-MCP/releases/latest/download/testrail-chat-setup.zip), распакуйте его и откройте папку `testrail-chat`. Запустите `Install Windows.cmd` в Windows, `Install macOS.command` в macOS или `sh "Install Linux.sh"` в Linux. Меню также можно открыть командой `node setup.mjs`. Требуется Node.js 22.12 или новее.
+
+Введите **1** для Codex, **2** для Gemini CLI, **3** для GitHub Copilot или **0** для выхода. Для Codex установщик установит плагин. Для Gemini и Copilot он проверит или установит выбранный CLI, скопирует сервер в папку данных пользователя и зарегистрирует его в настройках клиента. Пункт Copilot настраивает общий пользовательский MCP для Copilot CLI и актуального чата Copilot в VS Code. Откройте новую сессию, войдите в аккаунт при необходимости и подтвердите подключение в панели Chrome. Расширение Chrome устанавливается отдельно из `testrail-chrome-extension.zip`.
+
 ## Установка для Codex
 
 Скачайте архив своей системы со [страницы релизов](https://github.com/mikhailhimei/TestRail-AI-Generator-Cursor/releases). Клонировать репозиторий не нужно. Требуется Node.js 22.12 или новее.
