@@ -43,13 +43,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          if draft=$(gh release view v1.5.9 --json isDraft --jq '.isDraft' 2>/dev/null); then
+          if draft=$(gh release view v1.5.10 --json isDraft --jq '.isDraft' 2>/dev/null); then
             if [ "$draft" != true ]; then
-              echo 'v1.5.9 is already published; use a new release version.'
+              echo 'v1.5.10 is already published; use a new release version.'
               exit 1
             fi
           else
-            gh release create v1.5.9 --draft --target "${{ github.sha }}" --title 'v1.5.9 — Единый установщик TestRail MCP' --notes-file release-artifacts/v1.5.9/notes.md
+            gh release create v1.5.10 --draft --target "${{ github.sha }}" --title 'v1.5.10 — TestRail MCP для Qwen и DeepSeek' --notes-file release-artifacts/v1.5.10/notes.md
           fi
-          gh release upload v1.5.9 release-dist/* --clobber
-          gh release edit v1.5.9 --draft=false --latest --title 'v1.5.9 — Единый установщик TestRail MCP' --notes-file release-artifacts/v1.5.9/notes.md
+          gh release upload v1.5.10 release-dist/* --clobber
+          gh release edit v1.5.10 --draft=false --latest --title 'v1.5.10 — TestRail MCP для Qwen и DeepSeek' --notes-file release-artifacts/v1.5.10/notes.md
