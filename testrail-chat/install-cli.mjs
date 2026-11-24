@@ -145,6 +145,8 @@ export async function ensureCli(provider) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     await ensureCli(process.argv[2] || (await readFile(new URL('./provider.txt', import.meta.url), 'utf8')).trim());
+    const { installStandaloneService } = await import('./runtime/codex-service.mjs');
+    await installStandaloneService(path.dirname(fileURLToPath(import.meta.url)));
   } catch (error) {
     process.exitCode = 1;
     console.error(error.stderr?.trim?.() || error.message);

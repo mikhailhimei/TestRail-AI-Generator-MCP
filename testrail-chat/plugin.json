@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "testrail-chat",
-  "version": "1.5.8",
+  "version": "1.5.11",
   "description": "Work with TestRail AI Generator from chat using the bundled server, started automatically.",
   "author": {
     "name": "mikhailhimei"

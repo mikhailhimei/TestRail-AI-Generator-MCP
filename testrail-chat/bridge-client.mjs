@@ -13,9 +13,8 @@ export async function resolveBridgeEntry(pluginDirectory) {
 }
 
 export function createBridgeClient({ pluginDirectory, port = Number(process.env.CODEX_BRIDGE_PORT || 3210), stateRoot,
-  entry, confirmPair, configuredToken } = {}) {
+  entry, configuredToken } = {}) {
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw Error('Неверный CODEX_BRIDGE_PORT');
-  let ownedServer;
   let starting;
   let stopped = false;
   const url = `http://127.0.0.1:${port}`;
@@ -39,21 +38,16 @@ export function createBridgeClient({ pluginDirectory, port = Number(process.env.
     };
     if (await probe()) return token;
     if (stopped) throw Error('Подключение TestRail закрыто');
-    const { createBridge } = await import(pathToFileURL(bridgeEntry).href);
-    const server = createBridge({ token, confirmPair: confirmPair || runtime.confirmDesktopPair });
-    try {
-      await new Promise((resolve, reject) => {
-        const failed = error => { server.removeListener('listening', ready); reject(error); };
-        const ready = () => { server.removeListener('error', failed); resolve(); };
-        server.once('error', failed); server.once('listening', ready); server.listen(port, '127.0.0.1');
-      });
-    } catch (error) {
-      if (error.code === 'EADDRINUSE' && await probe()) return token;
-      throw Error('Не удалось запустить встроенный сервер TestRail');
+    const service = await import(pathToFileURL(path.join(path.dirname(bridgeEntry), 'codex-service.mjs')).href);
+    await service.startBridgeService(path.join(path.dirname(bridgeEntry), 'codex-service.mjs'), {
+      stateRoot: stateRoot || runtime.bridgeStateRoot(), port, configuredToken: token
+    });
+    for (let attempt = 0; attempt < 50; attempt++) {
+      if (stopped) throw Error('Подключение TestRail закрыто');
+      if (await probe()) return token;
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
-    ownedServer = server;
-    if (stopped) { server.closeAllConnections(); server.close(); throw Error('Подключение TestRail закрыто'); }
-    return token;
+    throw Error('Не удалось запустить фоновый сервер TestRail. Проверьте .codex-bridge/server.log.');
   };
   const ensureServer = () => {
     if (!starting) starting = bootstrap().finally(() => { starting = undefined; });
@@ -73,11 +67,6 @@ export function createBridgeClient({ pluginDirectory, port = Number(process.env.
     async close() {
       stopped = true;
       await starting?.catch(() => {});
-      if (ownedServer) {
-        ownedServer.closeAllConnections();
-        await new Promise(resolve => ownedServer.close(resolve));
-        ownedServer = undefined;
-      }
     }
   };
 }

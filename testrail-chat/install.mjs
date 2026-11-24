@@ -31,5 +31,7 @@ const [cli, prefix] = process.env.CODEX_INSTALL_CLI
   : codexCommand();
 execFileSync(cli, [...prefix, 'plugin', 'marketplace', 'add', marketplace], { stdio: 'inherit', windowsHide: true });
 execFileSync(cli, [...prefix, 'plugin', 'add', `${manifest.name}@testrail-local`], { stdio: 'inherit', windowsHide: true });
+const { installBackgroundService } = await import(pathToFileURL(path.join(destination, 'runtime', 'codex-service.mjs')).href);
+await installBackgroundService(destination);
 console.log('TestRail AI Generator установлен. Переподключите MCP / откройте новую беседу и выберите плагин.');
-console.log('Сервер включён в плагин и запускается автоматически при подключении к новому чату.');
+console.log('Для генерации из расширения открывать проект, консоль или чат не требуется.');

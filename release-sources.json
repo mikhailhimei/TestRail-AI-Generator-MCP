@@ -1,5 +1,5 @@
 {
-  "release": "v1.5.10",
+  "release": "v1.5.11",
   "chrome_extension": {
     "repository": "mikhailhimei/TestRail-AI-Generator",
     "commit": "bcccd7e4ae38fd9a62a4fba6b694b9c62427a62e",
@@ -7,5 +7,5 @@
     "manifest_version": "1.1.8",
     "build": "npm ci && npm run build"
   },
-  "verification": "node --test tests/*.test.mjs; extension build and mock/autotest suites"
+  "verification": "15 MCP tests; installer ZIP verification; installed Windows server health and Chrome synchronization. macOS/Linux launchers verified by tests, not on real desktops."
 }

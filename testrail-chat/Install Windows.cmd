@@ -14,5 +14,6 @@ if errorlevel 1 (
   exit /b 1
 )
 echo Plugin installed. Restart the MCP connection or open a new chat.
-echo The plugin starts its server automatically.
+echo Background server started. It will start again at login.
+echo You can close this window; no project or chat is required for Chrome generation.
 pause

@@ -1,11 +1,10 @@
 import { spawnSync } from 'node:child_process';
-import { cp, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
 import { ensureCli, qwenCommand } from './install-cli.mjs';
-import { bridgeStateRoot } from './runtime/codex-runtime.mjs';
+import { installStandaloneService } from './runtime/codex-service.mjs';
 import { agentCommand } from './runtime/local-agents.mjs';
 
 const providers = ['codex', 'gemini', 'copilot', 'qwen'];
@@ -46,14 +45,7 @@ function run(command, args) {
 
 async function configureMcp(provider) {
   await ensureCli(provider);
-  const destination = path.join(bridgeStateRoot(), 'mcp-server');
-  await mkdir(destination, { recursive: true });
-  for (const name of ['server.mjs', 'bridge-client.mjs', 'runtime']) {
-    const target = path.join(destination, name);
-    if (path.resolve(localFile(name)) !== path.resolve(target)) {
-      await cp(localFile(name), target, { recursive: true });
-    }
-  }
+  const destination = await installStandaloneService(path.dirname(fileURLToPath(import.meta.url)));
 
   const server = path.join(destination, 'server.mjs');
   const [command, prefix] = provider === 'qwen' ? qwenCommand() : agentCommand(`${provider}-mcp`);
