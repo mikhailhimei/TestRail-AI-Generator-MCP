@@ -4,11 +4,11 @@ import path from 'node:path';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
-import { ensureCli } from './install-cli.mjs';
+import { ensureCli, qwenCommand } from './install-cli.mjs';
 import { bridgeStateRoot } from './runtime/codex-runtime.mjs';
 import { agentCommand } from './runtime/local-agents.mjs';
 
-const providers = ['codex', 'gemini', 'copilot'];
+const providers = ['codex', 'gemini', 'copilot', 'qwen'];
 const input = createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -16,19 +16,19 @@ const input = createInterface({
 });
 
 console.log('TestRail AI Generator');
-console.log('1. Codex\n2. Gemini CLI\n3. GitHub Copilot\n0. Выход');
-input.setPrompt('Выберите клиента [0–3]: ');
+console.log('1. Codex\n2. Gemini CLI\n3. GitHub Copilot\n4. Qwen / DeepSeek (Qwen Code)\n0. Выход');
+input.setPrompt('Выберите клиента [0–4]: ');
 input.prompt();
 
 let provider;
 for await (const line of input) {
   const choice = line.trim();
   if (choice === '0') break;
-  if (/^[1-3]$/.test(choice)) {
+  if (/^[1-4]$/.test(choice)) {
     provider = providers[Number(choice) - 1];
     break;
   }
-  console.log('Введите 1, 2, 3 или 0.');
+  console.log('Введите 1, 2, 3, 4 или 0.');
   input.prompt();
 }
 input.close();
@@ -56,12 +56,17 @@ async function configureMcp(provider) {
   }
 
   const server = path.join(destination, 'server.mjs');
-  const [command, prefix] = agentCommand(`${provider}-mcp`);
-  const args = provider === 'gemini'
+  const [command, prefix] = provider === 'qwen' ? qwenCommand() : agentCommand(`${provider}-mcp`);
+  const args = provider !== 'copilot'
     ? ['mcp', 'add', '--scope', 'user', 'testrail-extension', process.execPath, server]
     : ['mcp', 'add', 'testrail-extension', '--', process.execPath, server];
   run(command, [...prefix, ...args]);
   console.log('TestRail MCP добавлен. Откройте новую сессию и войдите в аккаунт, если потребуется.');
+  if (provider === 'qwen') {
+    console.log('Запустите qwen, настройте модель Qwen или DeepSeek и проверьте подключение командой /mcp list.');
+    console.log('В расширении Chrome выберите «Codex (локальный сервер)», нажмите «Подключить Codex» и подтвердите доступ.');
+    return;
+  }
   console.log(`В расширении Chrome выберите ${provider === 'gemini' ? 'Gemini MCP' : 'Copilot MCP'}, нажмите «Подключить» и подтвердите доступ.`);
 }
 

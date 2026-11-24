@@ -11,6 +11,22 @@ import { agentCommand } from './runtime/local-agents.mjs';
 const providers = {
   codex: { label: 'Codex CLI', packageName: '@openai/codex', command: codexCommand },
   gemini: { label: 'Gemini CLI', packageName: '@google/gemini-cli', command: () => agentCommand('gemini-mcp') },
+  qwen: {
+    label: 'Qwen Code',
+    packageName: '@qwen-code/qwen-code',
+    command: () => {
+      if (process.platform === 'win32') {
+        for (const directory of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
+          const binDirectory = directory.replace(/^"|"$/g, '');
+          const script = path.join(binDirectory, 'node_modules', '@qwen-code', 'qwen-code', 'cli-entry.js');
+          if (existsSync(script)) return [process.execPath, [script]];
+          const executable = path.join(binDirectory, 'qwen.exe');
+          if (existsSync(executable)) return [executable, []];
+        }
+      }
+      return ['qwen', []];
+    },
+  },
   copilot: { label: 'Copilot CLI', packageName: '@github/copilot', command: () => agentCommand('copilot-mcp') },
 };
 
@@ -86,11 +102,15 @@ export async function downloadPackage(name, info, directory, npm, {
   return archive;
 }
 
+export function qwenCommand() {
+  return providers.qwen.command();
+}
+
 export async function ensureCli(provider) {
   const [major, minor] = process.versions.node.split('.').map(Number);
   if (major < 22 || (major === 22 && minor < 12)) throw Error('Требуется Node.js 22.12 или новее.');
   const { label, packageName, command } = Object.hasOwn(providers, provider) ? providers[provider] : {};
-  if (!command) throw Error('Укажите codex, gemini или copilot.');
+  if (!command) throw Error('Укажите codex, gemini, copilot или qwen.');
   if (versionWorks(command)) {
     console.log(`${label} уже установлен.`);
     return;
