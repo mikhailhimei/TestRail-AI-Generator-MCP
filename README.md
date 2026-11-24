@@ -6,23 +6,11 @@
 
 Скачайте [`testrail-chat-setup.zip`](https://github.com/mikhailhimei/TestRail-AI-Generator-MCP/releases/latest/download/testrail-chat-setup.zip), распакуйте его и откройте папку `testrail-chat`. Запустите `Install Windows.cmd` в Windows, `Install macOS.command` в macOS или `sh "Install Linux.sh"` в Linux. Меню также можно открыть командой `node setup.mjs`. Требуется Node.js 22.12 или новее.
 
-Введите **1** для Codex, **2** для Gemini CLI, **3** для GitHub Copilot, **4** для Qwen и DeepSeek или **0** для выхода. Для Codex установщик установит плагин. Для Gemini и Copilot он проверит или установит выбранный CLI, скопирует сервер в папку данных пользователя и зарегистрирует его в настройках клиента. Пункт Copilot настраивает общий пользовательский MCP для Copilot CLI и актуального чата Copilot в VS Code. Откройте новую сессию, войдите в аккаунт при необходимости и подтвердите подключение в панели Chrome. Расширение Chrome устанавливается отдельно из `testrail-chrome-extension.zip`.
+Введите **1** для Codex, **2** для Gemini CLI, **3** для GitHub Copilot, **4** для Qwen и DeepSeek или **0** для выхода. Для Codex установщик установит плагин. Для Gemini и Copilot он проверит или установит выбранный CLI, скопирует сервер в папку данных пользователя и зарегистрирует его в настройках клиента. Пункт Copilot настраивает общий пользовательский MCP для Copilot CLI и актуального чата Copilot в VS Code. Откройте новую сессию, войдите в аккаунт при необходимости и подтвердите подключение в панели Chrome. Расширение Chrome устанавливается отдельно. Инструкция доступна в [репозитории расширения](https://github.com/mikhailhimei/TestRail-AI-Generator).
 
 ## Установка для Codex
 
-Скачайте архив своей системы со [страницы релизов](https://github.com/mikhailhimei/TestRail-AI-Generator-Cursor/releases). Клонировать репозиторий не нужно. Требуется Node.js 22.12 или новее.
-
-Скачайте `testrail-chat-plugin-codex.zip` для любой из трёх ОС.
-
-| Система | Установщик |
-| --- | --- |
-| Windows | `Install Windows.cmd` |
-| macOS | `Install macOS.command` |
-| Linux | `sh "Install Linux.sh"` |
-
-Распакуйте весь архив и запустите указанный установщик из папки `testrail-chat`. Установщик использует системный Codex CLI или скачивает его из npm с индикатором прогресса. В Linux нужны графический сеанс и пакет `zenity` для окна подтверждения; в macOS используется штатный `osascript`.
-
-Если macOS-архиватор не сохранил право запуска, выполните `sh "Install macOS.command"` в терминале распакованной папки.
+В едином установщике выберите **1. Codex**. Он использует установленный Codex CLI или скачивает его из npm. В Linux для окна подтверждения нужны графический сеанс и пакет `zenity`, а в macOS используется штатный `osascript`.
 
 После установки:
 
@@ -36,13 +24,11 @@
 
 ## Подключение Gemini CLI и GitHub Copilot
 
-Скачайте `testrail-chat-plugin-gemini.zip` или `testrail-chat-plugin-copilot.zip` для своего агента и `testrail-chrome-extension.zip` из того же релиза. Оба MCP-архива подходят для Windows, macOS и Linux. Нужен Node.js 22.12 или новее. Распакуйте оба архива. На странице `chrome://extensions` включите режим разработчика и загрузите папку Chrome-расширения, в которой находится `manifest.json`.
+В едином установщике выберите **2. Gemini CLI** или **3. GitHub Copilot**. Откройте новую сессию выбранного клиента и войдите в аккаунт.
 
-- **Gemini CLI.** Установите Gemini CLI, выполните вход и из терминала добавьте сервер командой `gemini mcp add --scope user testrail-extension node "/полный/путь/testrail-chat/server.mjs"`. Запустите `gemini` в доверенной папке. Команда `/mcp list` покажет подключение.
-- **Copilot в VS Code.** Добавьте сервер в пользовательский `~/.copilot/mcp-config.json` или в `.mcp.json` проекта. В объекте `mcpServers` добавьте запись `"testrail-extension": { "type": "stdio", "command": "node", "args": ["/полный/путь/testrail-chat/server.mjs"] }`. Откройте чат Copilot и запустите сервер.
 - **Панель Chrome.** Выберите **Gemini MCP** или **Copilot MCP**, нажмите «Подключить» и подтвердите доступ. Оставьте панель и MCP-подключение открытыми. Закройте старые сессии с сервером предыдущей версии, чтобы новый сервер мог занять локальный порт.
 
-Для генерации из Chrome нужен авторизованный `gemini` или `copilot` в PATH процесса MCP. Запустите установщик из архива своего агента, если его CLI ещё не установлен. Для доступа к MCP из чата Copilot достаточно расширения VS Code. Для генерации АТ укажите корень Git-проекта и настройте в CLI разрешения на нужные команды проверок и браузерные инструменты. Gemini CLI должен доверять папке проекта.
+Для генерации из Chrome нужен авторизованный `gemini` или `copilot` в PATH процесса MCP. Для доступа к MCP из чата Copilot достаточно расширения VS Code. Для генерации АТ укажите корень Git-проекта и настройте в CLI разрешения на нужные команды проверок и браузерные инструменты. Gemini CLI должен доверять папке проекта.
 
 ## Подключение Qwen и DeepSeek из чата
 
@@ -69,7 +55,7 @@ cd TestRail-AI-Generator-Cursor
 git lfs pull
 ```
 
-Обычный GitHub Source code ZIP может содержать LFS-указатели вместо исполняемых файлов. Для установки используйте готовые архивы, приложенные к релизу.
+Обычный GitHub Source code ZIP может содержать LFS-указатели вместо исполняемых файлов. Для установки используйте единый установщик из релиза.
 
 ## Данные и проверка
 
@@ -85,4 +71,4 @@ git lfs pull
 Нужна актуальная версия приложения/расширения с разделом «Моки». Команды MCP работают одинаково для Codex, Gemini CLI, Copilot и других совместимых MCP-клиентов. Они сохраняют только черновики; вложения отправляются в TestRail при отдельной отправке ТК из приложения. После обновления перезапустите MCP и откройте новый чат, чтобы загрузить новые схемы и инструкции.
 
 
-Состав релиза: архивы Codex/Gemini/Copilot, расширение Chrome 1.1.2 и SHA256SUMS.txt. Исходный commit расширения зафиксирован в `release-sources.json`; сборка сохраняет multi-agent-провайдеры и JSON-моки. Для упаковки всех архивов: `python3 installers/package.py <output-dir> <extension-dist-dir>`.
+Релиз содержит `testrail-chat-setup.zip` и `SHA256SUMS.txt`. Для сборки установщика используйте `python3 installers/package.py <output-dir> --setup-only`.

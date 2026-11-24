@@ -18,38 +18,34 @@ jobs:
           node-version: '22'
       - name: Test MCP protocols and all CLI routes
         run: node --test tests/*.test.mjs
-      - name: Build and verify release archives
+      - name: Build and verify the unified installer
         run: |
-          python3 installers/package.py release-dist
-          cp release-artifacts/v1.5.8/testrail-chrome-extension.zip release-dist/
-          python3 - <<'PY'
-          import hashlib, json, zipfile
-          from pathlib import Path
-          root = Path('release-dist')
-          for file in root.glob('*.zip'):
-              with zipfile.ZipFile(file) as archive:
-                  assert archive.testzip() is None
-                  if file.name == 'testrail-chrome-extension.zip':
-                      assert json.loads(archive.read('manifest.json'))['version'] == '1.1.8'
-                  else:
-                      assert 'testrail-chat/runtime/codex-json-mocks.mjs' in archive.namelist()
-                  if file.name == 'testrail-chat-setup.zip':
-                      assert 'testrail-chat/setup.mjs' in archive.namelist()
-          assert (root / 'testrail-chat-setup.zip').is_file()
-          (root / 'SHA256SUMS.txt').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest() + '  ' + p.name + '\n' for p in sorted(root.glob('*.zip'))))
-          PY
-      - name: Publish complete release
+          python3 installers/package.py release-dist --setup-only
+          unzip -tq release-dist/testrail-chat-setup.zip
+          unzip -p release-dist/testrail-chat-setup.zip testrail-chat/setup.mjs > /dev/null
+      - name: Publish the unified installer
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          if draft=$(gh release view v1.5.10 --json isDraft --jq '.isDraft' 2>/dev/null); then
-            if [ "$draft" != true ]; then
-              echo 'v1.5.10 is already published; use a new release version.'
-              exit 1
-            fi
-          else
-            gh release create v1.5.10 --draft --target "${{ github.sha }}" --title 'v1.5.10 — TestRail MCP для Qwen и DeepSeek' --notes-file release-artifacts/v1.5.10/notes.md
+          version=v1.5.10
+          title='v1.5.10 — TestRail MCP для Qwen и DeepSeek'
+          notes="release-artifacts/$version/notes.md"
+          if ! draft=$(gh release view "$version" --json isDraft --jq '.isDraft' 2>/dev/null); then
+            gh release create "$version" --draft --target "${{ github.sha }}" --title "$title" --notes-file "$notes"
+            draft=true
           fi
-          gh release upload v1.5.10 release-dist/* --clobber
-          gh release edit v1.5.10 --draft=false --latest --title 'v1.5.10 — TestRail MCP для Qwen и DeepSeek' --notes-file release-artifacts/v1.5.10/notes.md
+          if [ "$draft" = true ]; then
+            gh release upload "$version" release-dist/testrail-chat-setup.zip --clobber
+          else
+            gh release download "$version" --pattern testrail-chat-setup.zip --dir release-dist --clobber
+          fi
+          (cd release-dist && sha256sum testrail-chat-setup.zip > SHA256SUMS.txt)
+          gh release upload "$version" release-dist/SHA256SUMS.txt --clobber
+          gh release view "$version" --json assets --jq '.assets[].name' > release-dist/assets.txt
+          for asset in testrail-chat-plugin-codex.zip testrail-chat-plugin-gemini.zip testrail-chat-plugin-copilot.zip testrail-chrome-extension.zip; do
+            if grep -Fxq "$asset" release-dist/assets.txt; then
+              gh release delete-asset "$version" "$asset" --yes
+            fi
+          done
+          gh release edit "$version" --draft=false --latest --title "$title" --notes-file "$notes"

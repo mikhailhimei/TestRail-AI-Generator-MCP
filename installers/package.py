@@ -48,7 +48,8 @@ def add_file(archive, name, data):
 
 common = ["server.mjs", "bridge-client.mjs", "install-cli.mjs", "JSON-MOCKS.md"]
 common += [file.relative_to(plugin).as_posix() for file in sorted((plugin / "runtime").glob("*.mjs"))]
-for agent in ("codex", "gemini", "copilot", "setup"):
+setup_only = sys.argv[2:] == ["--setup-only"]
+for agent in (("setup",) if setup_only else ("codex", "gemini", "copilot", "setup")):
     archive_name = "testrail-chat-setup.zip" if agent == "setup" else f"testrail-chat-plugin-{agent}.zip"
     archive_path = destination / archive_name
     with ZipFile(archive_path, "w") as archive:
@@ -78,7 +79,7 @@ for agent in ("codex", "gemini", "copilot", "setup"):
             raise ValueError(f"Invalid ZIP: {archive_path}")
     print(f"{archive_path.name}: {archive_path.stat().st_size:,} bytes")
 
-if len(sys.argv) > 2:
+if len(sys.argv) > 2 and not setup_only:
     extension = Path(sys.argv[2]).resolve()
     if not (extension / "manifest.json").is_file():
         raise ValueError("Extension build must contain manifest.json")

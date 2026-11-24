@@ -4,4 +4,4 @@
 2. Выберите **4**, откройте `qwen` и настройте модель Qwen или DeepSeek в Qwen Code. Команда `/mcp list` покажет сервер `testrail-extension`.
 3. В Chrome выберите **«Codex (локальный сервер)»**, нажмите **«Подключить Codex»** и подтвердите доступ. В этой версии интеграция Qwen и DeepSeek доступна из чата Qwen Code.
 
-Архивы для Codex, Gemini CLI и GitHub Copilot, Chrome-расширение 1.1.8 и контрольные суммы приложены к релизу.
+Этот установщик также подключает Codex, Gemini CLI и GitHub Copilot. Инструкция по установке Chrome-расширения доступна в [его репозитории](https://github.com/mikhailhimei/TestRail-AI-Generator).
