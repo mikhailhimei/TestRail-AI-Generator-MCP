@@ -28,8 +28,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          version=v1.5.11
-          title='v1.5.11 — Фоновый сервер и автозапуск для всех MCP-клиентов'
+          version=v1.5.12
+          title='v1.5.12 — Необязательная ссылка и удаление автотестов по TestRail ID'
           notes="release-artifacts/$version/notes.md"
           if ! draft=$(gh release view "$version" --json isDraft --jq '.isDraft' 2>/dev/null); then
             gh release create "$version" --draft --target "${{ github.sha }}" --title "$title" --notes-file "$notes"

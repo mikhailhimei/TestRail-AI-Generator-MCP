@@ -1,11 +1,17 @@
 {
-  "release": "v1.5.11",
+  "release": "v1.5.12",
   "chrome_extension": {
     "repository": "mikhailhimei/TestRail-AI-Generator",
-    "commit": "bcccd7e4ae38fd9a62a4fba6b694b9c62427a62e",
-    "branch": "release/json-mocks-all-mcp",
-    "manifest_version": "1.1.8",
-    "build": "npm ci && npm run build"
+    "included": false,
+    "compatibility": "Use the current extension build that sends TestRail case type to autotest generation."
   },
-  "verification": "15 MCP tests; installer ZIP verification; installed Windows server health and Chrome synchronization. macOS/Linux launchers verified by tests, not on real desktops."
+  "verification": "19 MCP tests; optional page URL; mixed update/delete autotest requests on all CLI routes; actual CLI prompt transfer; Delete MCP schema; unified installer ZIP content, executable permissions and SHA256. No live test deletion or manual macOS/Linux installation performed.",
+  "runtime_source": {
+    "repository": "mikhailhimei/TestRail-AI-Generator",
+    "commit": "879aad6cb13e3936054c2c6b568c3a3359cfc7d5",
+    "files": [
+      "scripts/codex-autotests.mjs"
+    ],
+    "integration": "Preserves MCP v1.5.11 source-reading, installers and background service; adds case-action capability and Delete MCP type."
+  }
 }

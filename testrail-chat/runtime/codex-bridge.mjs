@@ -246,7 +246,7 @@ export function createBridge({ token, generate = runCodex, timeoutMs = TIMEOUT, 
     if (auth.length !== expected.length || !timingSafeEqual(auth, expected)) return reply(401, { error: 'Неверный токен локального сервера' });
     const health = /^\/health(?:\/(gemini-mcp|copilot-mcp))?$/.exec(req.url);
     if (req.method === 'GET' && health) return reply(200, { status: 'ok', busy: busy || autotests.busy,
-      model: activeAgent === (health[1] || 'codex') ? activeModel : null });
+      model: activeAgent === (health[1] || 'codex') ? activeModel : null, autotestCaseActions: true });
     if (req.url?.startsWith('/autotests/')) {
       if (req.method !== 'POST') return reply(405, { error: 'Ожидается POST' });
       if (!origin) return reply(403, { error: 'Запуск АТ доступен только из расширения Chrome' });

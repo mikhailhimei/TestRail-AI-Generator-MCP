@@ -7,7 +7,7 @@ const testCase = {
   properties: {
     jsonMocks: MOCK_SCHEMA,
     title: { type: 'string', minLength: 1, maxLength: 2000 },
-    type: { type: 'string', enum: ['Functional', 'Smoke', 'Regression', 'Acceptance', 'Accessibility', 'Performance'] },
+    type: { type: 'string', enum: ['Functional', 'Smoke', 'Regression', 'Acceptance', 'Accessibility', 'Performance', 'Delete'] },
     priority: { type: 'string', enum: ['Low', 'Medium', 'High', 'Critical'] },
     preconditions: { type: 'string', maxLength: 20000 },
     steps: { type: 'array', maxItems: 200, items: {
@@ -29,7 +29,7 @@ export const CHAT_TOOLS = [
     { ...target, cases: { type: 'array', minItems: 1, maxItems: 100, items: testCase } }, ['sessionId', 'expectedRevision', 'cases']),
   tool('upsert_case_mocks', 'Save actual JSON files in an existing case Mocks section. Supply caseId and mocks with filename.json and json content string. Add new filenames or update matching names; preserve all other files and case fields. Do not put mock payloads only in preconditions. Does not publish attachments to TestRail.',
     { ...target, caseId: id, mocks: MOCK_SCHEMA }, ['sessionId', 'expectedRevision', 'caseId', 'mocks']),
-  tool('update_test_case', 'Replace the editable fields of one generated draft case. Uploaded cases cannot be changed here. Requires a fresh revision.',
+  tool('update_test_case', 'Replace the editable fields of one generated draft case. Uploaded cases cannot be changed here. Set type Delete and title Удалить to mark an obsolete case for deletion by TestRail and autotest actions; preserve its draft. Requires a fresh revision.',
     { ...target, caseId: id, case: testCase }, ['sessionId', 'expectedRevision', 'caseId', 'case']),
   tool('delete_test_cases', 'Remove explicitly requested generated drafts by ID. Uploaded cases cannot be removed here. Requires a fresh revision.',
     { ...target, caseIds: { type: 'array', minItems: 1, maxItems: 100, items: id } }, ['sessionId', 'expectedRevision', 'caseIds']),
