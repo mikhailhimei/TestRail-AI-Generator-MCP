@@ -50,7 +50,8 @@ export async function serveBridge() {
   const port = Number(process.env.CODEX_BRIDGE_PORT || 3210);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw Error('Неверный CODEX_BRIDGE_PORT');
   const token = await ensureBridgeToken(bridgeStateRoot());
-  const server = createBridge({ token, confirmPair: confirmDesktopPair });
+  const server = createBridge({ token, confirmPair: confirmDesktopPair,
+    autotestOptions: { storagePath: path.join(bridgeStateRoot(), '.codex-bridge', 'autotest-jobs.json') } });
   server.on('error', error => {
     // Another MCP adapter or login launcher may have won the startup race.
     if (error.code === 'EADDRINUSE') process.exit(0);

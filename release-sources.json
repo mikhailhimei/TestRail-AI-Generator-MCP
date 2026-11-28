@@ -1,17 +1,19 @@
 {
-  "release": "v1.5.12",
+  "release": "v1.5.13",
   "chrome_extension": {
     "repository": "mikhailhimei/TestRail-AI-Generator",
     "included": false,
     "compatibility": "Use the current extension build that sends TestRail case type to autotest generation."
   },
-  "verification": "19 MCP tests; optional page URL; mixed update/delete autotest requests on all CLI routes; actual CLI prompt transfer; Delete MCP schema; unified installer ZIP content, executable permissions and SHA256. No live test deletion or manual macOS/Linux installation performed.",
+  "verification": "21 MCP tests passed; one-hour timeout, cancellation, restart persistence, missing-job HTTP recovery and follow-up history; unified installer ZIP integrity and SHA-256. No manual macOS/Linux installation performed.",
   "runtime_source": {
     "repository": "mikhailhimei/TestRail-AI-Generator",
-    "commit": "879aad6cb13e3936054c2c6b568c3a3359cfc7d5",
+    "commit": "17cbf4c6a9e4af5b2fe60a89197a56aa2b661fd5",
     "files": [
-      "scripts/codex-autotests.mjs"
+      "scripts/codex-autotests.mjs",
+      "scripts/codex-bridge.mjs",
+      "scripts/codex-service.mjs"
     ],
-    "integration": "Preserves MCP v1.5.11 source-reading, installers and background service; adds case-action capability and Delete MCP type."
+    "integration": "Ports only autotest persistence, continuation and context recovery; sets the MCP autotest deadline to 60 minutes. Preserves other MCP v1.5.12 behavior."
   }
 }

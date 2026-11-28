@@ -271,8 +271,18 @@ export function createBridge({ token, generate = runCodex, timeoutMs = TIMEOUT, 
           finally { busy = false; }
         }
         if (!data || typeof data.id !== 'string') return reply(400, { error: 'Укажите ID задачи' });
+        const continuing = ['/autotests/continue', '/autotests/follow-up'].includes(req.url);
+        if (continuing && (busy || autotests.busy)) {
+          return reply(409, { error: 'Локальный сервер уже обрабатывает запрос' });
+        }
+        if (continuing && !autotests.get(data.id) && data.recovery) {
+          return reply(200, await autotests.recover(data.id, data.recovery,
+            req.url === '/autotests/follow-up' ? data.message ?? '' : undefined));
+        }
         const job = req.url === '/autotests/status' ? autotests.get(data.id)
-          : req.url === '/autotests/cancel' ? autotests.cancel(data.id) : null;
+          : req.url === '/autotests/cancel' ? autotests.cancel(data.id)
+            : req.url === '/autotests/continue' ? autotests.continue(data.id)
+            : req.url === '/autotests/follow-up' ? autotests.continue(data.id, data.message ?? '') : null;
         return job ? reply(200, job) : reply(404, { error: 'Задача не найдена. Возможно, сервер был перезапущен.' });
       } catch (error) { return reply(400, { error: error instanceof Error ? error.message : 'Ошибка запуска АТ' }); }
     }
